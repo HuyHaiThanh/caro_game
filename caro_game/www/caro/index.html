@@ -1,0 +1,294 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Caro trực tuyến{% endblock %}
+
+{% block head_include %}
+<meta name="description" content="Trò chơi caro trực tuyến">
+<link rel="stylesheet" href="/assets/caro_game/css/caro.css">
+{% endblock %}
+
+{% block page_content %}
+<div class="caro-container">
+    <header class="caro-header">
+        <div class="container">
+            <div class="logo-section">
+                <img src="/assets/caro_game/images/logo.svg" alt="Logo" class="logo">
+                <h1>Caro trực tuyến</h1>
+            </div>
+
+            <div class="user-section">
+                {% if frappe.session.user == 'Guest' %}
+                <button class="btn btn-primary login-btn" onclick="showLoginModal()">Đăng nhập</button>
+                {% else %}
+                <div class="user-info">
+                    <span class="coins">
+                        <img src="/assets/caro_game/images/coins.svg" alt="Coins" class="coin-icon">
+                        {{ player.coins }}
+                    </span>
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                            <img src="{{ player.avatar or '/assets/caro_game/images/avatar.svg' }}" alt="Avatar" class="user-avatar">
+                            {{ player.display_name }}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li><a href="/caro/profile">Hồ sơ</a></li>
+                            <li><a href="/caro/settings">Cài đặt</a></li>
+                            <li class="divider"></li>
+                            <li><a href="/logout">Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Game Options Section -->
+                <div class="game-options-card">
+                    <div class="game-header">
+                        <img src="/assets/caro_game/images/game-icon.svg" alt="Game icon" class="game-icon">
+                        <div>
+                            <h2>Caro trực tuyến</h2>
+                            <p>Người đầu tiên nối được năm quân cờ sẽ thắng</p>
+                        </div>
+                    </div>
+
+                    <div class="game-options">
+                        <button class="btn btn-default btn-block game-option">
+                            <i class="fa fa-users"></i> Chơi với một người bạn
+                        </button>
+                        <button class="btn btn-default btn-block game-option">
+                            <i class="fa fa-robot"></i> Chơi với robot
+                        </button>
+                        <button class="btn btn-primary btn-block game-option">
+                            <i class="fa fa-globe"></i> Chơi trực tuyến
+                            <small>với một người chơi ngẫu nhiên</small>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Leaderboard Section -->
+                <div class="leaderboard-card">
+                    <div class="leaderboard-list">
+                        {% for player in top_players %}
+                        <div class="leaderboard-item">
+                            <div class="player-info">
+                                <span class="rank">{{ loop.index }}.</span>
+                                <img src="{{ player.avatar or '/assets/caro_game/images/avatar.svg' }}" alt="{{ player.display_name }}" class="player-avatar">
+                                <span class="player-name">{{ player.display_name }}</span>
+                                <span class="player-country">{{ player.country }}</span>
+                            </div>
+                            <span class="player-rating">{{ player.rating }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="see-all-link">
+                        <a href="/caro/leaderboard">Nhìn thấy tất cả</a>
+                    </div>
+
+                    <div class="leaderboard-timer">
+                        <div>Bảng xếp hạng hàng ngày, kết thúc vào</div>
+                        <div class="timer" id="countdown-timer">
+                            <span id="hours">09</span>:<span id="minutes">18</span>:<span id="seconds">40</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <!-- Shop Section -->
+                <div class="shop-card">
+                    <div class="shop-header">
+                        <h2>Cửa hàng</h2>
+                        <div class="shop-coins">
+                            <img src="/assets/caro_game/images/coins.svg" alt="Coins" class="coin-icon">
+                            <span>{{ player.coins if player else 0 }}</span>
+                            <button class="btn btn-sm btn-default add-coins-btn">
+                                <i class="fa fa-plus-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Power-ups -->
+                    <div class="shop-section">
+                        {% for item in shop_powerups %}
+                        <div class="powerup-item">
+                            <div class="item-info">
+                                <img src="{{ item.image or '/assets/caro_game/images/boost-icon.svg' }}" alt="{{ item.item_name }}" class="item-image">
+                                <div>
+                                    <div class="item-name">{{ item.item_name }}</div>
+                                    <div class="item-duration">{{ item.duration }}</div>
+                                </div>
+                            </div>
+                            <div class="item-price">
+                                <img src="/assets/caro_game/images/coins.svg" alt="Coins" class="coin-icon-small">
+                                <span>{{ item.price }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Icons -->
+                    <div class="shop-section">
+                        <div class="section-header">
+                            <h3>icon</h3>
+                            <a href="/caro/shop?category=icons">Nhìn thấy tất cả</a>
+                        </div>
+                        <div class="items-grid">
+                            {% for item in shop_icons %}
+                            <div class="shop-item">
+                                <img src="{{ item.image or '/assets/caro_game/images/icon-1.svg' }}" alt="{{ item.item_name }}" class="item-image">
+                                <div class="item-price">
+                                    <img src="/assets/caro_game/images/coins.svg" alt="Coins" class="coin-icon-small">
+                                    <span>{{ item.price }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Avatars -->
+                    <div class="shop-section">
+                        <div class="section-header">
+                            <h3>avatar</h3>
+                            <a href="/caro/shop?category=avatars">Nhìn thấy tất cả</a>
+                        </div>
+                        <div class="items-grid">
+                            {% for item in shop_avatars %}
+                            <div class="shop-item">
+                                <img src="{{ item.image or '/assets/caro_game/images/avatar-1.svg' }}" alt="{{ item.item_name }}" class="item-image">
+                                <div class="item-price">
+                                    <img src="/assets/caro_game/images/coins.svg" alt="Coins" class="coin-icon-small">
+                                    <span>{{ item.price }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="loginModalLabel">Chào mừng bạn trở lại!</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="login-email">Địa chỉ email*</label>
+                            <input type="email" class="form-control" id="login-email" placeholder="Địa chỉ email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Mật khẩu*</label>
+                            <input type="password" class="form-control" id="login-password" placeholder="Mật khẩu" required>
+                            <div class="forgot-password">
+                                <a href="/forgot-password">Bạn đã quên mật khẩu?</a>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
+                    </form>
+
+                    <div class="register-link">
+                        <span>Bạn cần một tài khoản? </span>
+                        <a href="#" onclick="showRegisterModal()">Đăng ký</a>
+                    </div>
+
+                    <div class="social-login">
+                        <div class="divider">
+                            <span>hoặc</span>
+                        </div>
+
+                        <button class="btn btn-default btn-block social-btn google-btn">
+                            <img src="/assets/caro_game/images/google.svg" alt="Google">
+                            Tiếp tục với Google
+                        </button>
+                        <button class="btn btn-default btn-block social-btn facebook-btn">
+                            <img src="/assets/caro_game/images/facebook.svg" alt="Facebook">
+                            Tiếp tục với Facebook
+                        </button>
+                        <button class="btn btn-default btn-block social-btn discord-btn">
+                            <img src="/assets/caro_game/images/discord.svg" alt="Discord">
+                            Tiếp tục với Discord
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="registerModalLabel">Tạo một tài khoản</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="register-form">
+                        <div class="form-group">
+                            <label for="display-name">Tên hiển thị*</label>
+                            <input type="text" class="form-control" id="display-name" placeholder="Tên hiển thị" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-email">Địa chỉ email*</label>
+                            <input type="email" class="form-control" id="register-email" placeholder="Địa chỉ email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Mật khẩu*</label>
+                            <input type="password" class="form-control" id="register-password" placeholder="Mật khẩu" required>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" id="terms" required> Tôi đã đọc và đồng ý với <a href="/terms">Điều khoản và Điều kiện</a> và <a href="/privacy">Chính sách Quyền riêng tư</a> của papergames.io.
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Tiếp tục</button>
+                    </form>
+
+                    <div class="login-link">
+                        <span>Bạn đã có tài khoản? </span>
+                        <a href="#" onclick="showLoginModal()">Đăng nhập</a>
+                    </div>
+
+                    <div class="social-login">
+                        <div class="divider">
+                            <span>hoặc</span>
+                        </div>
+
+                        <button class="btn btn-default btn-block social-btn google-btn">
+                            <img src="/assets/caro_game/images/google.svg" alt="Google">
+                            Tiếp tục với Google
+                        </button>
+                        <button class="btn btn-default btn-block social-btn facebook-btn">
+                            <img src="/assets/caro_game/images/facebook.svg" alt="Facebook">
+                            Tiếp tục với Facebook
+                        </button>
+                        <button class="btn btn-default btn-block social-btn discord-btn">
+                            <img src="/assets/caro_game/images/discord.svg" alt="Discord">
+                            Tiếp tục với Discord
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/assets/caro_game/js/caro.js"></script>
+{% endblock %}

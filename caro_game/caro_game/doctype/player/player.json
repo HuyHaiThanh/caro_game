@@ -1,0 +1,122 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "autoname": "field:user",
+    "creation": "2023-05-15 10:00:00.000000",
+    "doctype": "DocType",
+    "editable_grid": 1,
+    "engine": "InnoDB",
+    "field_order": [
+     "user",
+     "display_name",
+     "rating",
+     "coins",
+     "country",
+     "avatar",
+     "games_played",
+     "games_won",
+     "games_lost",
+     "games_drawn"
+    ],
+    "fields": [
+     {
+      "fieldname": "user",
+      "fieldtype": "Link",
+      "in_list_view": 1,
+      "label": "User",
+      "options": "User",
+      "reqd": 1,
+      "unique": 1
+     },
+     {
+      "fieldname": "display_name",
+      "fieldtype": "Data",
+      "in_list_view": 1,
+      "label": "Display Name",
+      "reqd": 1
+     },
+     {
+      "default": "1500",
+      "fieldname": "rating",
+      "fieldtype": "Int",
+      "in_list_view": 1,
+      "label": "Rating"
+     },
+     {
+      "default": "1000",
+      "fieldname": "coins",
+      "fieldtype": "Int",
+      "label": "Coins"
+     },
+     {
+      "fieldname": "country",
+      "fieldtype": "Data",
+      "label": "Country"
+     },
+     {
+      "fieldname": "avatar",
+      "fieldtype": "Attach Image",
+      "label": "Avatar"
+     },
+     {
+      "default": "0",
+      "fieldname": "games_played",
+      "fieldtype": "Int",
+      "label": "Games Played"
+     },
+     {
+      "default": "0",
+      "fieldname": "games_won",
+      "fieldtype": "Int",
+      "label": "Games Won"
+     },
+     {
+      "default": "0",
+      "fieldname": "games_lost",
+      "fieldtype": "Int",
+      "label": "Games Lost"
+     },
+     {
+      "default": "0",
+      "fieldname": "games_drawn",
+      "fieldtype": "Int",
+      "label": "Games Drawn"
+     }
+    ],
+    "links": [],
+    "modified": "2023-05-15 10:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Caro Game",
+    "name": "Player",
+    "naming_rule": "By fieldname",
+    "owner": "Administrator",
+    "permissions": [
+     {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+     },
+     {
+      "create": 1,
+      "delete": 0,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "Player",
+      "share": 1,
+      "write": 1
+     }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": []
+}

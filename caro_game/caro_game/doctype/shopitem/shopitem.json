@@ -1,0 +1,88 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "autoname": "field:item_name",
+    "creation": "2023-05-15 10:00:00.000000",
+    "doctype": "DocType",
+    "editable_grid": 1,
+    "engine": "InnoDB",
+    "field_order": [
+     "item_name",
+     "item_type",
+     "description",
+     "price",
+     "duration",
+     "image"
+    ],
+    "fields": [
+     {
+      "fieldname": "item_name",
+      "fieldtype": "Data",
+      "in_list_view": 1,
+      "label": "Item Name",
+      "reqd": 1,
+      "unique": 1
+     },
+     {
+      "fieldname": "item_type",
+      "fieldtype": "Select",
+      "in_list_view": 1,
+      "label": "Item Type",
+      "options": "Powerup\nIcon\nAvatar",
+      "reqd": 1
+     },
+     {
+      "fieldname": "description",
+      "fieldtype": "Small Text",
+      "label": "Description"
+     },
+     {
+      "default": "100",
+      "fieldname": "price",
+      "fieldtype": "Int",
+      "in_list_view": 1,
+      "label": "Price",
+      "reqd": 1
+     },
+     {
+      "depends_on": "eval:doc.item_type=='Powerup'",
+      "fieldname": "duration",
+      "fieldtype": "Data",
+      "label": "Duration"
+     },
+     {
+      "fieldname": "image",
+      "fieldtype": "Attach Image",
+      "label": "Image",
+      "reqd": 1
+     }
+    ],
+    "links": [],
+    "modified": "2023-05-15 10:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Caro Game",
+    "name": "ShopItem",
+    "naming_rule": "By fieldname",
+    "owner": "Administrator",
+    "permissions": [
+     {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+     },
+     {
+      "read": 1,
+      "role": "Player"
+     }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": []
+   }

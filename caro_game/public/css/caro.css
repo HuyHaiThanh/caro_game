@@ -1,0 +1,376 @@
+/* Main Styles */
+.caro-container {
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+}
+
+/* Header Styles */
+.caro-header {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px 0;
+    margin-bottom: 20px;
+}
+
+.caro-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.user-section {
+    display: flex;
+    align-items: center;
+}
+
+.coins {
+    display: flex;
+    align-items: center;
+    background-color: #f8f8f8;
+    border-radius: 20px;
+    padding: 5px 12px;
+    margin-right: 10px;
+}
+
+.coin-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+}
+
+.user-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+/* Game Options Card */
+.game-options-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.game-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.game-icon {
+    width: 50px;
+    height: 50px;
+    margin-right: 15px;
+}
+
+.game-header h2 {
+    margin: 0 0 5px 0;
+    font-size: 24px;
+}
+
+.game-header p {
+    margin: 0;
+    color: #666;
+}
+
+.game-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.game-option {
+    text-align: left;
+    padding: 15px;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.game-option:hover {
+    background-color: #f5f5f5;
+}
+
+.game-option small {
+    display: block;
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+}
+
+/* Leaderboard Card */
+.leaderboard-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.leaderboard-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+}
+
+.rank {
+    font-weight: bold;
+    margin-right: 10px;
+    width: 20px;
+}
+
+.player-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.player-name {
+    font-weight: 500;
+}
+
+.player-country {
+    margin-left: 5px;
+    color: #888;
+}
+
+.player-rating {
+    font-weight: bold;
+    color: #333;
+}
+
+.see-all-link {
+    text-align: center;
+    margin: 10px 0;
+}
+
+.leaderboard-timer {
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.timer {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+/* Shop Card */
+.shop-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.shop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.shop-header h2 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.shop-coins {
+    display: flex;
+    align-items: center;
+    background-color: #f8f8f8;
+    border-radius: 20px;
+    padding: 5px 12px;
+}
+
+.coin-icon-small {
+    width: 15px;
+    height: 15px;
+    margin-right: 4px;
+}
+
+.add-coins-btn {
+    padding: 2px 6px;
+    margin-left: 5px;
+}
+
+.shop-section {
+    margin-bottom: 25px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.section-header h3 {
+    margin: 0;
+    text-transform: uppercase;
+    font-size: 14px;
+    color: #888;
+}
+
+.powerup-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+}
+
+.item-info {
+    display: flex;
+    align-items: center;
+}
+
+.item-image {
+    width: 35px;
+    height: 35px;
+    margin-right: 10px;
+}
+
+.item-name {
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.item-duration {
+    font-size: 12px;
+    color: #888;
+}
+
+.item-price {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+}
+
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.shop-item {
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+}
+
+.shop-item .item-image {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 8px;
+}
+
+.shop-item .item-price {
+    justify-content: center;
+}
+
+/* Login & Register Modals */
+.modal-content {
+    border-radius: 10px;
+}
+
+.modal-title {
+    font-weight: 500;
+}
+
+.login-link, .register-link {
+    text-align: center;
+    margin: 15px 0;
+}
+
+.divider {
+    text-align: center;
+    margin: 20px 0;
+    position: relative;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: #eee;
+    z-index: -1;
+}
+
+.divider span {
+    background-color: white;
+    padding: 0 10px;
+    color: #888;
+}
+
+.social-btn {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #eee;
+    transition: all 0.2s ease;
+}
+
+.social-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.social-btn img {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+}
+
+.forgot-password {
+    text-align: right;
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    .game-options-card, .leaderboard-card, .shop-card {
+        margin-bottom: 15px;
+    }
+    
+    .items-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

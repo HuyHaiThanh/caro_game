@@ -29,8 +29,8 @@ app_license = "mit"
 # app_include_js = "/assets/caro_game/js/caro_game.js"
 
 # include js, css files in header of web template
-# web_include_css = "/assets/caro_game/css/caro_game.css"
-# web_include_js = "/assets/caro_game/js/caro_game.js"
+web_include_css = "/assets/caro_game/css/caro.css"
+web_include_js = "/assets/caro_game/js/caro.js"
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "caro_game/public/scss/website"
@@ -236,4 +236,13 @@ app_license = "mit"
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
+
+# Website user home page
+# --------------------
+website_route_rules = [
+    {"from_route": "/caro", "to_route": "caro/index"},
+]
+
+# allow guest to access caro game homepage without login
+website_guest_access = ["/caro", "/caro/index"]
 
