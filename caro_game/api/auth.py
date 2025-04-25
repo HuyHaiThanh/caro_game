@@ -60,7 +60,12 @@ def register(email, password, display_name):
             pass
             
         if user_exists:
-            user_name, creation_time = user_exists if isinstance(user_exists, (list, tuple)) else (user_exists, None)
+            # Xử lý kết quả user_exists an toàn hơn
+            if isinstance(user_exists, (list, tuple)) and len(user_exists) >= 2:
+                user_name, creation_time = user_exists
+            else:
+                user_name = user_exists
+                creation_time = None
             
             # Kiểm tra xem người dùng đã được tạo gần đây chưa (trong vòng 5 phút)
             if creation_time:

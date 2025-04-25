@@ -1,0 +1,644 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block head_include %}
+<meta name="description" content="{{ title }}">
+<link rel="stylesheet" href="/assets/caro_game/css/caro.css">
+<style>
+    .profile-header {
+        background-color: #343a40;
+        color: white;
+        padding: 2rem 0;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 4px solid #fff;
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    
+    .profile-info {
+        padding-left: 2rem;
+    }
+    
+    .stats-card {
+        margin-bottom: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+    }
+    
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 24px;
+        font-weight: bold;
+        color: #343a40;
+        margin-bottom: 5px;
+    }
+    
+    .stat-label {
+        color: #6c757d;
+        font-size: 14px;
+    }
+    
+    .profile-tab-content {
+        padding: 1rem;
+    }
+    
+    .security-form .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .match-history-item {
+        border-left: 4px solid;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+    }
+    
+    .match-win {
+        border-color: #28a745;
+    }
+    
+    .match-loss {
+        border-color: #dc3545;
+    }
+    
+    .match-draw {
+        border-color: #6c757d;
+    }
+    
+    .match-result {
+        font-weight: bold;
+    }
+    
+    .win {
+        color: #28a745;
+    }
+    
+    .loss {
+        color: #dc3545;
+    }
+    
+    .draw {
+        color: #6c757d;
+    }
+    
+    .achievement-item {
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        background-color: #f8f9fa;
+    }
+    
+    .achievement-icon {
+        width: 32px;
+        height: 32px;
+        margin-right: 10px;
+    }
+    
+    .owned-items-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 15px;
+        margin-top: 1rem;
+    }
+    
+    .owned-item {
+        text-align: center;
+    }
+    
+    .owned-item img {
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        margin-bottom: 5px;
+    }
+    
+    .toggle-password {
+        cursor: pointer;
+        margin-left: -30px;
+    }
+</style>
+{% endblock %}
+
+{% block page_content %}
+<div class="caro-container">
+    <header class="caro-header">
+        <div class="container">
+            <div class="logo-section">
+                <a href="/caro">
+                    <img src="/assets/caro_game/images/logo.svg" alt="Logo" class="logo">
+                </a>
+                <h1>Hồ sơ người chơi</h1>
+            </div>
+
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="coins">
+                        <img src="/assets/caro_game/images/coins.svg" alt="Coins" class="coin-icon">
+                        {{ player.coins }}
+                    </span>
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                            <img src="{{ player.avatar or '/assets/caro_game/images/avatar.svg' }}" alt="Avatar" class="user-avatar">
+                            {{ player.display_name }}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li class="active"><a href="/caro/profile">Hồ sơ</a></li>
+                            <li><a href="/caro/settings">Cài đặt</a></li>
+                            <li class="divider"></li>
+                            <li><a href="/logout">Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="profile-header row">
+            <div class="col-md-3 text-center">
+                <img src="{{ player.avatar or '/assets/caro_game/images/avatar.svg' }}" alt="{{ player.display_name }}" class="profile-avatar">
+            </div>
+            <div class="col-md-9 profile-info">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h2>{{ player.display_name }}</h2>
+                        <p>{{ player.bio or 'Chưa có thông tin giới thiệu.' }}</p>
+                        <p><i class="fa fa-globe"></i> {{ player.country or 'Chưa cập nhật' }}</p>
+                        <p><i class="fa fa-calendar"></i> Tham gia từ {{ frappe.utils.format_date(player.date_joined or frappe.utils.today()) }}</p>
+                    </div>
+                    <div class="col-md-4 text-right">
+                        <div class="player-rating">
+                            <h3>Xếp hạng</h3>
+                            <h2>{{ player.rating or 1000 }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-card">
+            <div class="row">
+                <div class="col-md-3 col-sm-6 stat-item">
+                    <div class="stat-number">{{ stats.total_games }}</div>
+                    <div class="stat-label">Tổng số trận</div>
+                </div>
+                <div class="col-md-3 col-sm-6 stat-item">
+                    <div class="stat-number">{{ stats.wins }}</div>
+                    <div class="stat-label">Thắng</div>
+                </div>
+                <div class="col-md-3 col-sm-6 stat-item">
+                    <div class="stat-number">{{ stats.losses }}</div>
+                    <div class="stat-label">Thua</div>
+                </div>
+                <div class="col-md-3 col-sm-6 stat-item">
+                    <div class="stat-number">{{ stats.win_percentage }}%</div>
+                    <div class="stat-label">Tỷ lệ thắng</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs for profile sections -->
+        <div class="profile-tabs">
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#match-history" aria-controls="match-history" role="tab" data-toggle="tab">Lịch sử đấu</a></li>
+                <li role="presentation"><a href="#achievements" aria-controls="achievements" role="tab" data-toggle="tab">Thành tích</a></li>
+                <li role="presentation"><a href="#owned-items" aria-controls="owned-items" role="tab" data-toggle="tab">Bộ sưu tập</a></li>
+                <li role="presentation"><a href="#security" aria-controls="security" role="tab" data-toggle="tab">Bảo mật</a></li>
+            </ul>
+
+            <!-- Tab content -->
+            <div class="tab-content profile-tab-content">
+                <!-- Match History -->
+                <div role="tabpanel" class="tab-pane active" id="match-history">
+                    <h3>Lịch sử đấu gần đây</h3>
+                    {% if match_history %}
+                        {% for match in match_history %}
+                            {% set is_player1 = match.player1 == player.name %}
+                            {% set opponent = match.player2 if is_player1 else match.player1 %}
+                            {% set player_score = match.player1_score if is_player1 else match.player2_score %}
+                            {% set opponent_score = match.player2_score if is_player1 else match.player1_score %}
+                            {% set result = 'draw' if match.winner == 'Draw' else ('win' if match.winner == player.name else 'loss') %}
+                            
+                            <div class="match-history-item match-{{ result }}">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h4>Trận đấu vs {{ frappe.get_value('Player', opponent, 'display_name') or opponent }}</h4>
+                                        <p>{{ frappe.utils.format_datetime(match.game_date) }}</p>
+                                    </div>
+                                    <div class="col-md-4 text-right">
+                                        <span class="match-result {{ result }}">
+                                            {% if result == 'win' %}
+                                                Thắng
+                                            {% elif result == 'loss' %}
+                                                Thua
+                                            {% else %}
+                                                Hòa
+                                            {% endif %}
+                                        </span>
+                                        <div class="match-score">{{ player_score }} - {{ opponent_score }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>Bạn chưa có trận đấu nào.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Achievements -->
+                <div role="tabpanel" class="tab-pane" id="achievements">
+                    <h3>Thành tích của bạn</h3>
+                    {% if achievements %}
+                        {% for achievement in achievements %}
+                            <div class="achievement-item">
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <img src="/assets/caro_game/images/icon-1.svg" alt="Achievement" class="achievement-icon">
+                                    </div>
+                                    <div class="col-md-9">
+                                        <h4>{{ frappe.get_value('Achievement', achievement.achievement, 'title') or achievement.achievement }}</h4>
+                                        <p>{{ frappe.get_value('Achievement', achievement.achievement, 'description') or 'Thành tích đạt được' }}</p>
+                                    </div>
+                                    <div class="col-md-2 text-right">
+                                        <div>{{ frappe.utils.format_date(achievement.date_earned) }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center">
+                            <img src="/assets/caro_game/images/icon-1.svg" alt="No achievements" style="width: 80px; opacity: 0.5; margin-bottom: 20px;">
+                            <h4>Bạn chưa có thành tích nào</h4>
+                            <p>Bắt đầu chơi để mở khóa các thành tích!</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Owned Items -->
+                <div role="tabpanel" class="tab-pane" id="owned-items">
+                    <h3>Bộ sưu tập của bạn</h3>
+                    
+                    <ul class="nav nav-pills" role="tablist">
+                        <li role="presentation" class="active"><a href="#avatars" aria-controls="avatars" role="tab" data-toggle="tab">Avatar</a></li>
+                        <li role="presentation"><a href="#icons" aria-controls="icons" role="tab" data-toggle="tab">Icon</a></li>
+                        <li role="presentation"><a href="#powerups" aria-controls="powerups" role="tab" data-toggle="tab">Vật phẩm</a></li>
+                    </ul>
+                    
+                    <div class="tab-content">
+                        <!-- Avatars -->
+                        <div role="tabpanel" class="tab-pane active" id="avatars">
+                            <p>Nhấn vào avatar để thiết lập làm avatar hiện tại của bạn.</p>
+                            <div class="owned-items-grid">
+                                {% set avatar_found = false %}
+                                {% for item in owned_items %}
+                                    {% if item.item_type == 'Avatar' %}
+                                        {% set avatar_found = true %}
+                                        <div class="owned-item">
+                                            <img src="{{ frappe.get_value('ShopItem', item.item, 'image') or '/assets/caro_game/images/avatar.svg' }}" 
+                                                 alt="{{ frappe.get_value('ShopItem', item.item, 'item_name') or 'Avatar' }}"
+                                                 data-item="{{ item.item }}"
+                                                 class="select-avatar {% if player.avatar == frappe.get_value('ShopItem', item.item, 'image') %}active{% endif %}">
+                                            <div class="item-name">{{ frappe.get_value('ShopItem', item.item, 'item_name') or 'Avatar' }}</div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if not avatar_found %}
+                                    <p>Bạn chưa có avatar nào. Hãy mua avatar trong cửa hàng.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Icons -->
+                        <div role="tabpanel" class="tab-pane" id="icons">
+                            <p>Nhấn vào icon để thiết lập làm icon trong trò chơi.</p>
+                            <div class="owned-items-grid">
+                                {% set icon_found = false %}
+                                {% for item in owned_items %}
+                                    {% if item.item_type == 'Icon' %}
+                                        {% set icon_found = true %}
+                                        <div class="owned-item">
+                                            <img src="{{ frappe.get_value('ShopItem', item.item, 'image') or '/assets/caro_game/images/icon-1.svg' }}" 
+                                                 alt="{{ frappe.get_value('ShopItem', item.item, 'item_name') or 'Icon' }}"
+                                                 data-item="{{ item.item }}"
+                                                 class="select-icon">
+                                            <div class="item-name">{{ frappe.get_value('ShopItem', item.item, 'item_name') or 'Icon' }}</div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if not icon_found %}
+                                    <p>Bạn chưa có icon nào. Hãy mua icon trong cửa hàng.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Powerups -->
+                        <div role="tabpanel" class="tab-pane" id="powerups">
+                            <p>Các vật phẩm bạn đang sở hữu.</p>
+                            {% set powerup_found = false %}
+                            {% for item in owned_items %}
+                                {% if item.item_type == 'Powerup' %}
+                                    {% set powerup_found = true %}
+                                    <div class="achievement-item">
+                                        <div class="row">
+                                            <div class="col-md-1">
+                                                <img src="{{ frappe.get_value('ShopItem', item.item, 'image') or '/assets/caro_game/images/boost-icon.svg' }}" 
+                                                     alt="{{ frappe.get_value('ShopItem', item.item, 'item_name') or 'Powerup' }}" 
+                                                     class="achievement-icon">
+                                            </div>
+                                            <div class="col-md-9">
+                                                <h4>{{ frappe.get_value('ShopItem', item.item, 'item_name') or 'Powerup' }}</h4>
+                                                <p>{{ frappe.get_value('ShopItem', item.item, 'description') or 'Mô tả vật phẩm' }}</p>
+                                            </div>
+                                            <div class="col-md-2 text-right">
+                                                <div>Số lượng: 1</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                            {% if not powerup_found %}
+                                <p>Bạn chưa có vật phẩm nào. Hãy mua vật phẩm trong cửa hàng.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Settings -->
+                <div role="tabpanel" class="tab-pane" id="security">
+                    <h3>Thông tin tài khoản</h3>
+                    
+                    <form class="security-form">
+                        <div class="form-group">
+                            <label for="display-name">Tên hiển thị</label>
+                            <input type="text" class="form-control" id="display-name" value="{{ player.display_name }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Địa chỉ email</label>
+                            <input type="email" class="form-control" id="email" value="{{ user_info.email }}" readonly>
+                            <small class="form-text text-muted">Email không thể thay đổi.</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="country">Quốc gia</label>
+                            <select class="form-control" id="country">
+                                <option value="VN" {% if player.country == 'VN' %}selected{% endif %}>Việt Nam</option>
+                                <option value="US" {% if player.country == 'US' %}selected{% endif %}>United States</option>
+                                <option value="JP" {% if player.country == 'JP' %}selected{% endif %}>Japan</option>
+                                <option value="KR" {% if player.country == 'KR' %}selected{% endif %}>South Korea</option>
+                                <option value="CN" {% if player.country == 'CN' %}selected{% endif %}>China</option>
+                                <!-- Add more country options -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bio">Giới thiệu về bạn</label>
+                            <textarea class="form-control" id="bio" rows="3">{{ player.bio or '' }}</textarea>
+                        </div>
+                        
+                        <button type="button" class="btn btn-primary" id="save-profile-btn">Lưu thông tin</button>
+                    </form>
+                    
+                    <hr>
+                    
+                    <h3>Đổi mật khẩu</h3>
+                    <form class="security-form">
+                        <div class="form-group">
+                            <label for="current-password">Mật khẩu hiện tại</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="current-password">
+                                <span class="input-group-addon toggle-password" data-target="current-password">
+                                    <i class="fa fa-eye"></i>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="new-password">Mật khẩu mới</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="new-password">
+                                <span class="input-group-addon toggle-password" data-target="new-password">
+                                    <i class="fa fa-eye"></i>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirm-password">Xác nhận mật khẩu mới</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="confirm-password">
+                                <span class="input-group-addon toggle-password" data-target="confirm-password">
+                                    <i class="fa fa-eye"></i>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="btn btn-primary" id="change-password-btn">Đổi mật khẩu</button>
+                    </form>
+                    
+                    <hr>
+                    
+                    <h3>Tài khoản liên kết</h3>
+                    <div class="linked-accounts">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <button class="btn btn-default btn-block social-btn google-btn">
+                                    <img src="/assets/caro_game/images/google.svg" alt="Google">
+                                    Liên kết Google
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-default btn-block social-btn facebook-btn">
+                                    <img src="/assets/caro_game/images/facebook.svg" alt="Facebook">
+                                    Liên kết Facebook
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-default btn-block social-btn discord-btn">
+                                    <img src="/assets/caro_game/images/discord.svg" alt="Discord">
+                                    Liên kết Discord
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/assets/caro_game/js/caro.js"></script>
+<script>
+$(document).ready(function() {
+    // Toggle password visibility
+    $('.toggle-password').click(function() {
+        const targetId = $(this).data('target');
+        const passwordField = $('#' + targetId);
+        const icon = $(this).find('i');
+        
+        if (passwordField.attr('type') === 'password') {
+            passwordField.attr('type', 'text');
+            icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            passwordField.attr('type', 'password');
+            icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
+    
+    // Save profile information
+    $('#save-profile-btn').click(function() {
+        const displayName = $('#display-name').val();
+        const country = $('#country').val();
+        const bio = $('#bio').val();
+        
+        frappe.call({
+            method: 'caro_game.api.update_player_profile',
+            args: {
+                display_name: displayName,
+                country: country,
+                bio: bio
+            },
+            callback: function(response) {
+                if (response.message && response.message.success) {
+                    frappe.show_alert({
+                        message: 'Thông tin hồ sơ đã được cập nhật!',
+                        indicator: 'green'
+                    }, 5);
+                } else {
+                    frappe.show_alert({
+                        message: 'Không thể cập nhật thông tin hồ sơ. Vui lòng thử lại!',
+                        indicator: 'red'
+                    }, 5);
+                }
+            }
+        });
+    });
+    
+    // Change password
+    $('#change-password-btn').click(function() {
+        const currentPassword = $('#current-password').val();
+        const newPassword = $('#new-password').val();
+        const confirmPassword = $('#confirm-password').val();
+        
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            frappe.show_alert({
+                message: 'Vui lòng nhập đầy đủ thông tin mật khẩu!',
+                indicator: 'red'
+            }, 5);
+            return;
+        }
+        
+        if (newPassword !== confirmPassword) {
+            frappe.show_alert({
+                message: 'Mật khẩu xác nhận không khớp với mật khẩu mới!',
+                indicator: 'red'
+            }, 5);
+            return;
+        }
+        
+        frappe.call({
+            method: 'caro_game.api.change_password',
+            args: {
+                current_password: currentPassword,
+                new_password: newPassword
+            },
+            callback: function(response) {
+                if (response.message && response.message.success) {
+                    $('#current-password').val('');
+                    $('#new-password').val('');
+                    $('#confirm-password').val('');
+                    
+                    frappe.show_alert({
+                        message: 'Mật khẩu đã được thay đổi thành công!',
+                        indicator: 'green'
+                    }, 5);
+                } else {
+                    frappe.show_alert({
+                        message: response.message?.error || 'Không thể đổi mật khẩu. Vui lòng thử lại!',
+                        indicator: 'red'
+                    }, 5);
+                }
+            }
+        });
+    });
+    
+    // Set avatar
+    $('.select-avatar').click(function() {
+        const itemId = $(this).data('item');
+        const imgSrc = $(this).attr('src');
+        
+        frappe.call({
+            method: 'caro_game.api.set_player_avatar',
+            args: {
+                item_id: itemId
+            },
+            callback: function(response) {
+                if (response.message && response.message.success) {
+                    // Update all avatar images on the page
+                    $('.user-avatar, .profile-avatar').attr('src', imgSrc);
+                    
+                    // Update active state
+                    $('.select-avatar').removeClass('active');
+                    $(this).addClass('active');
+                    
+                    frappe.show_alert({
+                        message: 'Avatar đã được cập nhật!',
+                        indicator: 'green'
+                    }, 5);
+                } else {
+                    frappe.show_alert({
+                        message: 'Không thể cập nhật avatar. Vui lòng thử lại!',
+                        indicator: 'red'
+                    }, 5);
+                }
+            }
+        });
+    });
+    
+    // Set game icon
+    $('.select-icon').click(function() {
+        const itemId = $(this).data('item');
+        
+        frappe.call({
+            method: 'caro_game.api.set_player_icon',
+            args: {
+                item_id: itemId
+            },
+            callback: function(response) {
+                if (response.message && response.message.success) {
+                    // Update active state
+                    $('.select-icon').removeClass('active');
+                    $(this).addClass('active');
+                    
+                    frappe.show_alert({
+                        message: 'Icon trong game đã được cập nhật!',
+                        indicator: 'green'
+                    }, 5);
+                } else {
+                    frappe.show_alert({
+                        message: 'Không thể cập nhật icon. Vui lòng thử lại!',
+                        indicator: 'red'
+                    }, 5);
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -236,7 +236,7 @@
                     <h4 class="modal-title" id="registerModalLabel">Tạo một tài khoản</h4>
                 </div>
                 <div class="modal-body">
-                    <form id="register-form">
+                    <form id="register-form" onsubmit="submitRegisterForm(event); return false;" autocomplete="off">
                         <div class="form-group">
                             <label for="display-name">Tên hiển thị*</label>
                             <input type="text" class="form-control" id="display-name" placeholder="Tên hiển thị" required>
