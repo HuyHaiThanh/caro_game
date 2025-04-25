@@ -3,11 +3,11 @@ $(document).ready(function() {
     // Timer countdown functionality
     startCountdown();
     
-    // Xử lý nút đăng nhập trong header
-    $('.login-btn').on('click', function(e) {
-        e.preventDefault();
-        showLoginModal();
-    });
+    // Kiểm tra nếu người dùng đã đăng nhập thành công từ phiên đăng ký
+    if (localStorage.getItem('registration_success')) {
+        showSuccessToast('Đăng ký thành công! Bạn đã được đăng nhập vào hệ thống.');
+        localStorage.removeItem('registration_success');
+    }
     
     // Login form submission
     $('#login-form').on('submit', function(e) {
@@ -16,8 +16,8 @@ $(document).ready(function() {
         const email = $('#login-email').val();
         const password = $('#login-password').val();
         
-        // Hiển thị loading indicator
-        frappe.ui.form.states.set_state($(this), 'loading');
+        // Hiển thị thông báo đang xử lý
+        showProcessingToast('Đang đăng nhập...');
         
         frappe.call({
             method: 'caro_game.api.auth.login',
@@ -26,22 +26,22 @@ $(document).ready(function() {
                 pwd: password
             },
             callback: function(response) {
-                frappe.ui.form.states.clear_state($('#login-form'));
                 if (response.message && response.message.success) {
                     // Hiển thị thông báo thành công
-                    frappe.show_alert({
-                        message: 'Đăng nhập thành công!',
-                        indicator: 'green'
-                    });
-                    // Reload page on successful login
+                    showSuccessToast('Đăng nhập thành công!');
+                    
+                    // Reload page on successful login sau 1 giây
                     setTimeout(function() {
                         window.location.reload();
                     }, 1000);
                 } else {
                     // Show error message
                     const errorMsg = (response.message && response.message.error) || 'Đã xảy ra lỗi khi đăng nhập';
-                    frappe.throw(errorMsg);
+                    showErrorToast(errorMsg);
                 }
+            },
+            error: function() {
+                showErrorToast('Không thể kết nối đến máy chủ. Vui lòng thử lại sau.');
             }
         });
     });
@@ -55,12 +55,15 @@ $(document).ready(function() {
         const password = $('#register-password').val();
         
         if (!$('#terms').is(':checked')) {
-            frappe.throw('Bạn phải đồng ý với điều khoản dịch vụ');
+            showErrorToast('Bạn phải đồng ý với điều khoản dịch vụ');
             return;
         }
         
-        // Hiển thị loading indicator
-        frappe.ui.form.states.set_state($(this), 'loading');
+        // Hiển thị thông báo đang xử lý
+        showProcessingToast('Đang tiến hành đăng ký...');
+        
+        // Vô hiệu hóa nút đăng ký để tránh nhấn nhiều lần
+        $('#register-form button[type="submit"]').prop('disabled', true);
         
         frappe.call({
             method: 'caro_game.api.auth.register',
@@ -70,30 +73,59 @@ $(document).ready(function() {
                 display_name: displayName
             },
             callback: function(response) {
-                frappe.ui.form.states.clear_state($('#register-form'));
                 if (response.message && response.message.success) {
-                    // Show success message and redirect to login
-                    frappe.show_alert({
-                        message: 'Đăng ký thành công! Vui lòng đăng nhập.',
-                        indicator: 'green'
-                    });
+                    // Ẩn modal đăng ký
+                    $('#registerModal').modal('hide');
+                    
+                    // Xử lý trường hợp đã đăng ký trước đó
+                    if (response.message.already_registered) {
+                        showSuccessToast('Tài khoản đã tồn tại, đang đăng nhập...');
+                    } else {
+                        // Show success message
+                        showSuccessToast('Đăng ký thành công! Đang đăng nhập...');
+                    }
+                    
+                    // Lưu trạng thái đăng ký thành công
+                    localStorage.setItem('registration_success', 'true');
+                    
+                    // Đợi một khoảng thời gian trước khi đăng nhập
                     setTimeout(function() {
-                        showLoginModal();
+                        // Đăng nhập tự động sau khi đăng ký
+                        frappe.call({
+                            method: 'caro_game.api.auth.login',
+                            args: {
+                                usr: email,
+                                pwd: password
+                            },
+                            callback: function(loginResponse) {
+                                if (loginResponse.message && loginResponse.message.success) {
+                                    // Reload page after successful login/registration
+                                    window.location.reload();
+                                } else {
+                                    // Nếu đăng nhập thất bại, hiển thị thông báo và chuyển sang form đăng nhập
+                                    showErrorToast('Đăng nhập tự động thất bại, vui lòng đăng nhập thủ công.');
+                                    setTimeout(function() {
+                                        showLoginModal();
+                                        // Điền sẵn email vào form đăng nhập
+                                        $('#login-email').val(email);
+                                    }, 1500);
+                                }
+                            }
+                        });
                     }, 2000);
                 } else {
                     // Show error message
                     const errorMsg = (response.message && response.message.error) || 'Đã xảy ra lỗi khi đăng ký';
-                    frappe.throw(errorMsg);
+                    showErrorToast(errorMsg);
+                    
+                    // Enable the submit button again
+                    $('#register-form button[type="submit"]').prop('disabled', false);
                 }
+            },
+            error: function() {
+                showErrorToast('Không thể kết nối đến máy chủ. Vui lòng thử lại sau.');
+                $('#register-form button[type="submit"]').prop('disabled', false);
             }
-        });
-    });
-    
-    // Xử lý các nút mạng xã hội
-    $('.social-btn').on('click', function() {
-        frappe.show_alert({
-            message: 'Tính năng đăng nhập bằng mạng xã hội đang được phát triển.',
-            indicator: 'yellow'
         });
     });
 });
@@ -102,12 +134,40 @@ $(document).ready(function() {
 function showLoginModal() {
     $('#registerModal').modal('hide');
     $('#loginModal').modal('show');
+    
+    // Reset form
+    $('#login-form')[0].reset();
 }
 
 // Show register modal
 function showRegisterModal() {
     $('#loginModal').modal('hide');
     $('#registerModal').modal('show');
+    
+    // Reset form
+    $('#register-form')[0].reset();
+}
+
+// Show toast messages
+function showSuccessToast(message) {
+    frappe.show_alert({
+        message: message,
+        indicator: 'green'
+    }, 5);
+}
+
+function showErrorToast(message) {
+    frappe.show_alert({
+        message: message,
+        indicator: 'red'
+    }, 5);
+}
+
+function showProcessingToast(message) {
+    frappe.show_alert({
+        message: message,
+        indicator: 'blue'
+    }, 3);
 }
 
 // Start countdown timer
